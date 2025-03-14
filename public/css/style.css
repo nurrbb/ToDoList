@@ -1,0 +1,32 @@
+/* Tüm sayfayı kapsayan renk geçişli arka plan */
+body {
+    margin: 0;
+    min-height: 100vh; /* Ekranın tamamını kapla */
+    display: flex;
+    align-items: center;  /* Dikeyde ortala */
+    justify-content: center; /* Yatayda ortala */
+
+    /* Gradient (renk geçişi) - soldan sağa */
+    background: linear-gradient(to right, #f7cac9, #92a8d1);
+}
+
+/* Ortadaki ana container */
+.todo-wrapper {
+    background-color: rgba(255, 255, 255, 0.8); /* Beyaz ve hafif şeffaf */
+    backdrop-filter: blur(4px);                 /* Arka planı biraz blur yapar (tarayıcı desteğine göre) */
+    border-radius: 10px;
+    padding: 20px;
+    width: 500px; /* Genişlik */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Todo kartları arası boşluk */
+#todosContainer .card {
+    margin-bottom: 15px;
+}
+
+/* Tamamlanmış kartlar için renk */
+#todosContainer .card.completed {
+    opacity: 0.8;
+    background-color: #cce8cc;
+}
