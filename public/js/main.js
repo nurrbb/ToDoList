@@ -1,6 +1,7 @@
 $(document).ready(function() {
-    let currentFilter = 'all';
+    let currentFilter = 'all'; // Varsayılan olarak tüm görevler gösterilir.
 
+    // Sayfa yüklendiğinde tüm görevleri getir
     function loadTodos() {
         $.ajax({
             url: '/todos',
@@ -11,10 +12,12 @@ $(document).ready(function() {
         });
     }
 
+    // Görevleri belirtilen filtreye göre listeleme fonksiyonu
     function renderTodos(todos) {
         const container = $('#todosContainer');
         container.empty();
 
+        // Filtreleme işlemi
         const filtered = todos.filter(todo => {
             if (currentFilter === 'completed') return todo.completed;
             else if (currentFilter === 'pending') return !todo.completed;
@@ -26,6 +29,7 @@ $(document).ready(function() {
             return;
         }
 
+        // Her görev için dinamik olarak kart oluştur
         filtered.forEach(todo => {
             const isCompleted = todo.completed ? 'completed' : '';
             const titleClass = todo.completed ? 'text-decoration-line-through' : '';
@@ -52,6 +56,7 @@ $(document).ready(function() {
         });
     }
 
+    // Yeni görev ekleme formu gönderildiğinde çalışacak fonksiyon
     $('#addTodoForm').submit(function(e) {
         e.preventDefault();
         const title = $('#todoTitle').val();
@@ -66,22 +71,24 @@ $(document).ready(function() {
                 $('#todoTitle').val('');
                 $('#todoDescription').val('');
                 $('#addTodoModal').modal('hide');
-                loadTodos();
+                loadTodos(); // Listeyi güncelle
             }
         });
     });
 
+    // Görevi silme işlemi
     $(document).on('click', '.deleteBtn', function() {
         const id = $(this).data('id');
         $.ajax({
             url: '/todos/' + id,
             method: 'DELETE',
             success: function() {
-                loadTodos();
+                loadTodos(); // Listeyi güncelle
             }
         });
     });
 
+    // Görevi tamamlandı olarak işaretleme işlemi
     $(document).on('click', '.completeBtn', function() {
         const id = $(this).data('id');
         $.ajax({
@@ -90,11 +97,12 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify({ completed: true }),
             success: function() {
-                loadTodos();
+                loadTodos(); // Listeyi güncelle
             }
         });
     });
 
+    // Düzenleme butonuna tıklanınca modalı aç ve bilgileri göster
     $(document).on('click', '.editBtn', function() {
         const id = $(this).data('id');
         const title = $(this).data('title');
@@ -106,6 +114,7 @@ $(document).ready(function() {
         $('#editTodoModal').modal('show');
     });
 
+    // Görevi düzenleme formu gönderildiğinde çalışacak fonksiyon
     $('#editTodoForm').submit(function(e) {
         e.preventDefault();
         const id = $('#editTodoId').val();
@@ -119,15 +128,17 @@ $(document).ready(function() {
             data: JSON.stringify({ title, description }),
             success: function() {
                 $('#editTodoModal').modal('hide');
-                loadTodos();
+                loadTodos(); // Listeyi güncelle
             }
         });
     });
 
+    // Filtreleme işlemi için event listener
     $('#filterStatus').change(function() {
         currentFilter = $(this).val();
-        loadTodos();
+        loadTodos(); // Listeyi güncelle
     });
 
+    // Sayfa yüklendiğinde görevleri getir
     loadTodos();
 });

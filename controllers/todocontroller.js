@@ -1,7 +1,8 @@
 const fs = require("fs");
 const path = require("path");
-const dbPath = path.join(__dirname, "../db/db.json");
+const dbPath = path.join(__dirname, "../db/db.json"); // JSON veritabanı dosyasının yolu
 
+// JSON dosyasını okuma fonksiyonu
 const readTodos = (callback) => {
     fs.readFile(dbPath, "utf8", (err, data) => {
         if (err) return callback(err, null);
@@ -18,46 +19,55 @@ const readTodos = (callback) => {
     });
 };
 
+// JSON dosyasına yazma fonksiyonu
 const writeTodos = (todos, callback) => {
     fs.writeFile(dbPath, JSON.stringify(todos, null, 2), callback);
 };
 
+// Tüm görevleri getiren fonksiyon
 exports.getTodos = (req, res) => {
     readTodos((err, todos) => {
         if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
-        res.render("index", { todos });
+        res.render("index", { todos }); // HTML şablonuna görevleri gönder
     });
 };
 
+// Yeni görev ekleyen fonksiyon
 exports.addTodo = (req, res) => {
     const { title, description } = req.body;
     if (!title && !description) {
         return res.status(400).json({ error: "Başlık veya Açıklama boş olamaz!" });
     }
+
+    // Yeni görev nesnesi oluşturuluyor
     const newTodo = {
-        id: Date.now().toString(),
+        id: Date.now().toString(), // Benzersiz bir ID oluştur
         title: title || "Başlık Yok",
         description: description || "Açıklama Yok",
         completed: false,
         deleted: false
     };
+
     readTodos((err, todos) => {
         if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
         todos.push(newTodo);
         writeTodos(todos, (err) => {
             if (err) return res.status(500).json({ error: "Dosya yazma hatası" });
-            res.redirect("/");
+            res.redirect("/"); // Görev eklendikten sonra anasayfaya yönlendir
         });
     });
 };
 
+// Görevi silme işlemi (soft delete)
 exports.deleteTodo = (req, res) => {
     const { id } = req.params;
     readTodos((err, todos) => {
         if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+
+        // Silinecek görevi bul
         const index = todos.findIndex(todo => todo.id === id);
         if (index !== -1) {
-            todos[index].deleted = true;
+            todos[index].deleted = true; // Silindi olarak işaretle
             writeTodos(todos, (err) => {
                 if (err) return res.status(500).json({ error: "Dosya yazma hatası" });
                 res.redirect("/");
@@ -68,10 +78,13 @@ exports.deleteTodo = (req, res) => {
     });
 };
 
+// Görevi tamamlandı olarak işaretleme
 exports.completeTodo = (req, res) => {
     const { id } = req.params;
     readTodos((err, todos) => {
         if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+
+        // Tamamlanacak görevi bul
         const index = todos.findIndex(todo => todo.id === id);
         if (index !== -1) {
             todos[index].completed = true;
@@ -85,13 +98,16 @@ exports.completeTodo = (req, res) => {
     });
 };
 
+// Silinen bir görevi geri yükleme
 exports.restoreTodo = (req, res) => {
     const { id } = req.params;
     readTodos((err, todos) => {
         if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+
+        // Geri yüklenecek görevi bul
         const index = todos.findIndex(todo => todo.id === id);
         if (index !== -1) {
-            todos[index].deleted = false;
+            todos[index].deleted = false; // Silinme durumunu kaldır
             writeTodos(todos, (err) => {
                 if (err) return res.status(500).json({ error: "Dosya yazma hatası" });
                 res.redirect("/");
@@ -102,11 +118,15 @@ exports.restoreTodo = (req, res) => {
     });
 };
 
+// Mevcut bir görevi güncelleme
 exports.updateTodo = (req, res) => {
     const { id } = req.params;
     const { title, description } = req.body;
+
     readTodos((err, todos) => {
         if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+
+        // Güncellenecek görevi bul
         const index = todos.findIndex(todo => todo.id === id);
         if (index !== -1) {
             todos[index].title = title || todos[index].title;

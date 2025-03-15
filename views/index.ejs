@@ -1,103 +1,28 @@
-<!DOCTYPE html>
-<html lang="tr">
+<!-- Sayfa genel ayarları ve stil dosyaları -->
 <head>
-    <meta charset="UTF-8" />
-    <title>Todo List - Gradient UI</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css" />
-    <style>
-        body {
-            background: #000000;
-            font-family: 'Poppins', sans-serif;
-            color: white;
-            overflow-x: hidden;
-            position: relative;
-        }
-        .todo-wrapper {
-            max-width: 700px;
-            margin: 30px auto;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            box-shadow: 0px 10px 30px rgba(255, 255, 255, 0.2);
-            position: relative;
-            z-index: 2;
-            backdrop-filter: blur(10px);
-        }
-        h1 {
-            font-weight: 600;
-            color: #ffffff;
-        }
-        /* Emoji animasyonu */
-        .emoji {
-            position: absolute;
-            /* top değeri JS'de rastgele atanıyor */
-            font-size: 2rem;
-            pointer-events: none;
-            z-index: 1;
-            user-select: none;
-            opacity: 1;
-            animation: fall linear infinite;
-        }
-        @keyframes fall {
-            from {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(150vh);
-                opacity: 0;
-            }
-        }
-        /* Todo kartlarının arka planı: şeffaf siyah */
-        .card {
-            background-color: rgba(0, 0, 0, 0.5) !important;
-            border: none;
-        }
-        .modal-content {
-            background: #222;
-            opacity: 1 !important;
-        }
-        .modal-header, .modal-footer {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-        }
-        .modal-title {
-            color: white;
-        }
-        .form-label, .form-control {
-            color: white;
-            background-color: #333;
-            border: 1px solid #666;
-        }
-        .form-control:focus {
-            background-color: #444;
-            border-color: #007bff;
-        }
-        /* Silinen görevlerin üzerini çizili yap */
-        .deleted {
-            text-decoration: line-through;
-        }
-    </style>
+    ...
 </head>
+
 <body>
 <div class="todo-wrapper">
     <h1 class="text-center mb-4">✨To Do List ✨</h1>
 
+    <!-- Yeni görev ekleme butonu -->
     <div class="text-end mb-3">
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTodoModal">+ Yeni Görev</button>
     </div>
 
+    <!-- Görev filtreleme alanı -->
     <div class="mb-3">
         <select id="filterStatus" class="form-select">
-            <option value="pending">Yapılacaklar</option>
-            <option value="completed">Tamamlananlar</option>
-            <option value="deleted">Silinenler</option>
-            <option value="all">Tümü</option>
+            <option value="pending">🚀 Yapılacaklar 🚀</option>
+            <option value="completed">💫 Tamamlananlar 💫</option>
+            <option value="deleted">🛸 Silinenler 🛸</option>
+            <option value="all">🪐 Tümü 🪐</option>
         </select>
     </div>
 
+    <!-- Görevler listeleniyor -->
     <div id="todosContainer">
         <% if(todos && todos.length > 0) { %>
             <% todos.forEach(function(todo){ %>
@@ -105,11 +30,11 @@
                     <div class="card-body">
                         <div>
                             <h5 class="card-title <%= todo.deleted ? 'deleted' : (todo.completed ? 'completed' : '') %>">
-                                📝 <%= todo.title ? todo.title : "Başlık Yok" %>
+                                📝 <%= todo.title ? todo.title : "Görev Yok" %>
                                 <% if(todo.completed && !todo.deleted) { %> ✅✅✅ <% } %>
                             </h5>
                             <p class="card-text <%= todo.deleted ? 'deleted' : (todo.completed ? 'completed' : '') %>">
-                                💬 <%= todo.description ? todo.description : "Açıklama Yok" %>
+                                💬 <%= todo.description ? todo.description : "Detay Yok" %>
                             </p>
                         </div>
                         <div class="todo-buttons">
@@ -132,12 +57,12 @@
                 </div>
             <% }); %>
         <% } else { %>
-            <p class="text-center">Henüz eklenmiş bir görev bulunmamaktadır.</p>
+            <p class="text-center"></p>
         <% } %>
     </div>
 </div>
 
-<!-- Add Todo Modal -->
+<!-- Yeni görev ekleme modalı -->
 <div class="modal fade" id="addTodoModal" tabindex="-1" aria-labelledby="addTodoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <form id="addTodoForm" class="modal-content" action="/todos/add" method="POST">
@@ -163,33 +88,7 @@
     </div>
 </div>
 
-<!-- Edit Todo Modal -->
-<div class="modal fade" id="editTodoModal" tabindex="-1" aria-labelledby="editTodoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="editTodoForm" class="modal-content" method="POST">
-            <!-- POST isteği kullanılacağından method override input'u kaldırıldı -->
-            <div class="modal-header">
-                <h5 class="modal-title" id="editTodoModalLabel">Görevi Düzenle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="editTodoTitle" class="form-label">Görev</label>
-                    <input type="text" class="form-control" id="editTodoTitle" name="title" required />
-                </div>
-                <div class="mb-3">
-                    <label for="editTodoDescription" class="form-label">Detay</label>
-                    <textarea class="form-control" id="editTodoDescription" name="description"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                <button type="submit" class="btn btn-primary">Kaydet</button>
-            </div>
-        </form>
-    </div>
-</div>
-
+<!-- Animasyonlu gökyüzü efektleri -->
 <script>
     function createParticles() {
         const objects = ["⭐", "🌙", "🪐", "🌕", "☄️"];
@@ -210,10 +109,13 @@
     document.addEventListener('DOMContentLoaded', createParticles);
 </script>
 
+<!-- Bootstrap ve jQuery eklentileri -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
     $(document).ready(function() {
+        // Filtreleme işlemi
         $('#filterStatus').change(function() {
             var selectedStatus = $(this).val();
             $('.card').each(function() {
@@ -224,7 +126,8 @@
                     $(this).hide();
                 }
             });
-            // Eğer seçili kategori için görünür görev kalmadıysa mesaj göster:
+
+            // Eğer seçili kategori için görünür görev kalmadıysa mesaj göster
             var visibleCards = $('.card:visible').length;
             if(visibleCards === 0) {
                 if($('#noTasksMessage').length === 0) {
@@ -232,28 +135,30 @@
                 }
                 var message = '';
                 if(selectedStatus === 'pending') {
-                    message = 'Henüz yapılacak görev bulunmamaktadır.';
+                    message = 'Verimli bir gün.';
                 } else if(selectedStatus === 'completed') {
-                    message = 'Henüz tamamlanmış görev bulunmamaktadır.';
+                    message = 'Çalışmaya devam !';
                 } else if(selectedStatus === 'deleted') {
-                    message = 'Henüz silinmiş görev bulunmamaktadır.';
+                    message = 'Her şey yolunda!';
                 } else {
-                    message = 'Henüz eklenmiş bir görev bulunmamaktadır.';
+                    message = 'Planlamaya başlayalım!';
                 }
                 $('#noTasksMessage').text(message);
             } else {
                 $('#noTasksMessage').remove();
             }
         });
-        // Sayfa yüklendiğinde varsayılan olarak "Yapılacaklar" gösterilsin:
+
+        // Sayfa yüklendiğinde filtreyi uygula
         $('#filterStatus').trigger('change');
+
+        // Görev düzenleme modalı
         $('.editBtn').on('click', function() {
             var id = $(this).data('id');
             var title = $(this).data('title');
             var description = $(this).data('description');
             $('#editTodoModal').find('#editTodoTitle').val(title);
             $('#editTodoModal').find('#editTodoDescription').val(description);
-            // Form action URL'si "/todos/:id/update" olarak ayarlanıyor:
             $('#editTodoForm').attr('action', '/todos/' + id + '/update');
             $('#editTodoModal').modal('show');
         });
