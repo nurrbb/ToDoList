@@ -41,13 +41,13 @@ Bu komut uygulamanın [http://localhost:4444](http://localhost:4444) adresinde �
 
 ## 🎯 API Kullanımı
 
-| Yöntem | Endpoint         | Açıklama                 |
-|--------|----------------|--------------------------|
-| GET    | /todos         | Tüm görevleri getirir    |
-| GET    | /todos/:id     | Belirtilen ID'ye sahip görevi getirir |
-| POST   | /todos         | Yeni bir görev ekler     |
-| PUT    | /todos/:id     | Belirtilen görevi günceller |
-| DELETE | /todos/:id     | Belirtilen görevi siler  |
+| Yöntem | Endpoint         | Açıklama                              |
+|--------|------------------|---------------------------------------|
+| GET    | /todos           | Tüm görevleri getirir                 |
+| GET    | /todos/:id       | Belirtilen ID'ye sahip görevi getirir |
+| POST   | /todos           | Yeni bir görev ekler                  |
+| PUT    | /todos/:id       | Belirtilen görevi günceller           |
+| DELETE | /todos/:id       | Belirtilen görevi siler               |
 
 
 
