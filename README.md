@@ -1,4 +1,4 @@
-# 📌 Todo List Uygulaması
+# 📌 To do List Uygulaması
 
 Bu, kullanıcıların görevlerini yönetmelerine olanak tanıyan basit bir Todo List uygulamasıdır. Kullanıcılar görev ekleyebilir, düzenleyebilir, tamamlayabilir ve silebilirler. Uygulama, JSON tabanlı bir veritabanı (LowDB) kullanarak görevleri saklar.
 
