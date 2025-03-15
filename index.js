@@ -1,27 +1,21 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const path = require('path');
-const PORT = 4444;
+const path = require("path");
+const todoController = require("./controllers/todoController");
 
-// JSON body parse middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// View engine ayarları: EJS kullanıyoruz
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-// Statik dosyaları servis et (CSS, JS vs.)
-app.use(express.static(path.join(__dirname, 'public')));
+app.get("/", todoController.getTodos);
+app.post("/todos/add", todoController.addTodo);
+app.get("/todos/:id/delete", todoController.deleteTodo);
+app.get("/todos/:id/complete", todoController.completeTodo);
+app.get("/todos/:id/restore", todoController.restoreTodo);
+app.post("/todos/:id/update", todoController.updateTodo);
 
-// API route’ları: /todos altındaki tüm istekler
-const todoRoutes = require('./routes/todoRoutes');
-app.use('/todos', todoRoutes);
-
-// Ana sayfa: index.ejs render ediliyor
-app.get('/', (req, res) => {
-    res.render('index');
-});
-
-app.listen(PORT, () => {
-    console.log(`Sunucu ${PORT} portunda çalışıyor.`);
+app.listen(4444, () => {
+    console.log("Sunucu 4444 portunda çalışıyor.");
 });

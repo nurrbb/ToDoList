@@ -1,7 +1,6 @@
 $(document).ready(function() {
     let currentFilter = 'all';
 
-    // Todo'ları yükleyen fonksiyon
     function loadTodos() {
         $.ajax({
             url: '/todos',
@@ -12,16 +11,14 @@ $(document).ready(function() {
         });
     }
 
-    // Todo'ları ekrana kart (card) şeklinde basma
     function renderTodos(todos) {
         const container = $('#todosContainer');
         container.empty();
 
-        // Filtre uygulama
         const filtered = todos.filter(todo => {
             if (currentFilter === 'completed') return todo.completed;
             else if (currentFilter === 'pending') return !todo.completed;
-            return true; // all
+            return true;
         });
 
         if (filtered.length === 0) {
@@ -29,33 +26,32 @@ $(document).ready(function() {
             return;
         }
 
-        // Her bir todo için kart oluştur
         filtered.forEach(todo => {
             const isCompleted = todo.completed ? 'completed' : '';
             const titleClass = todo.completed ? 'text-decoration-line-through' : '';
             const descriptionClass = todo.completed ? 'text-decoration-line-through' : '';
 
             const cardHtml = `
-        <div class="card mb-2 ${isCompleted}">
-          <div class="card-body">
-            <h5 class="card-title ${titleClass}">${todo.title || 'Başlık Yok'}</h5>
-            <p class="card-text ${descriptionClass}">${todo.description || 'Açıklama Yok'}</p>
-            <div class="d-flex justify-content-end gap-2">
-              ${
+                <div class="card mb-2 ${isCompleted}">
+                    <div class="card-body">
+                        <h5 class="card-title ${titleClass}">${todo.title || 'Başlık Yok'}</h5>
+                        <p class="card-text ${descriptionClass}">${todo.description || 'Açıklama Yok'}</p>
+                        <div class="d-flex justify-content-end gap-2">
+                            ${
                 !todo.completed
                     ? `<button class="btn btn-sm btn-success completeBtn" data-id="${todo.id}">Tamamlandı</button>`
                     : ''
             }
-              <button class="btn btn-sm btn-danger deleteBtn" data-id="${todo.id}">Sil</button>
-            </div>
-          </div>
-        </div>
-      `;
+                            <button class="btn btn-sm btn-primary editBtn" data-id="${todo.id}" data-title="${todo.title}" data-description="${todo.description}">Düzenle</button>
+                            <button class="btn btn-sm btn-danger deleteBtn" data-id="${todo.id}">Sil</button>
+                        </div>
+                    </div>
+                </div>
+            `;
             container.append(cardHtml);
         });
     }
 
-    // Yeni todo ekleme
     $('#addTodoForm').submit(function(e) {
         e.preventDefault();
         const title = $('#todoTitle').val();
@@ -69,14 +65,12 @@ $(document).ready(function() {
             success: function() {
                 $('#todoTitle').val('');
                 $('#todoDescription').val('');
-                // Modalı kapat
                 $('#addTodoModal').modal('hide');
                 loadTodos();
             }
         });
     });
 
-    // Todo silme
     $(document).on('click', '.deleteBtn', function() {
         const id = $(this).data('id');
         $.ajax({
@@ -88,7 +82,6 @@ $(document).ready(function() {
         });
     });
 
-    // Todo tamamlandı
     $(document).on('click', '.completeBtn', function() {
         const id = $(this).data('id');
         $.ajax({
@@ -102,12 +95,39 @@ $(document).ready(function() {
         });
     });
 
-    // Filtre seçeneği
+    $(document).on('click', '.editBtn', function() {
+        const id = $(this).data('id');
+        const title = $(this).data('title');
+        const description = $(this).data('description');
+
+        $('#editTodoId').val(id);
+        $('#editTodoTitle').val(title);
+        $('#editTodoDescription').val(description);
+        $('#editTodoModal').modal('show');
+    });
+
+    $('#editTodoForm').submit(function(e) {
+        e.preventDefault();
+        const id = $('#editTodoId').val();
+        const title = $('#editTodoTitle').val();
+        const description = $('#editTodoDescription').val();
+
+        $.ajax({
+            url: '/todos/' + id,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ title, description }),
+            success: function() {
+                $('#editTodoModal').modal('hide');
+                loadTodos();
+            }
+        });
+    });
+
     $('#filterStatus').change(function() {
         currentFilter = $(this).val();
         loadTodos();
     });
 
-    // Sayfa yüklendiğinde todo'ları yükle
     loadTodos();
 });

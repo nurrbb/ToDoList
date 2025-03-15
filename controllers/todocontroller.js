@@ -1,69 +1,122 @@
-// controllers/todoController.js
-const Todo = require('../models/Todo');
+const fs = require("fs");
+const path = require("path");
+const dbPath = path.join(__dirname, "../db/db.json");
 
-// Tüm todo'ları döndür
-exports.getAllTodos = async (req, res) => {
-    try {
-        const todos = await Todo.getAll();
-        res.json(todos);
-    } catch (error) {
-        res.status(500).json({ error: 'Todo list alınırken hata oluştu.' });
-    }
+const readTodos = (callback) => {
+    fs.readFile(dbPath, "utf8", (err, data) => {
+        if (err) return callback(err, null);
+        let todos = [];
+        try {
+            todos = JSON.parse(data);
+            if (!Array.isArray(todos)) {
+                todos = [];
+            }
+        } catch (e) {
+            todos = [];
+        }
+        callback(null, todos);
+    });
 };
 
-// Belirli id'li todo'yu döndür
-exports.getTodoById = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const todo = await Todo.getById(id);
-        if (!todo) {
-            return res.status(404).json({ error: 'Todo bulunamadı.' });
-        }
-        res.json(todo);
-    } catch (error) {
-        res.status(500).json({ error: 'Todo alınırken hata oluştu.' });
-    }
+const writeTodos = (todos, callback) => {
+    fs.writeFile(dbPath, JSON.stringify(todos, null, 2), callback);
 };
 
-// Yeni todo oluştur
-exports.createTodo = async (req, res) => {
-    try {
-        const { title, description } = req.body;
-        if (!title) {
-            return res.status(400).json({ error: 'Başlık gerekli.' });
-        }
-        const newTodo = await Todo.create({ title, description });
-        res.status(201).json(newTodo);
-    } catch (error) {
-        res.status(500).json({ error: 'Todo oluşturulurken hata oluştu.' });
-    }
+exports.getTodos = (req, res) => {
+    readTodos((err, todos) => {
+        if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+        res.render("index", { todos });
+    });
 };
 
-// Todo güncelle
-exports.updateTodo = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const { title, description, completed } = req.body;
-        const updatedTodo = await Todo.update(id, { title, description, completed });
-        if (!updatedTodo) {
-            return res.status(404).json({ error: 'Todo bulunamadı.' });
-        }
-        res.json(updatedTodo);
-    } catch (error) {
-        res.status(500).json({ error: 'Todo güncellenirken hata oluştu.' });
+exports.addTodo = (req, res) => {
+    const { title, description } = req.body;
+    if (!title && !description) {
+        return res.status(400).json({ error: "Başlık veya Açıklama boş olamaz!" });
     }
+    const newTodo = {
+        id: Date.now().toString(),
+        title: title || "Başlık Yok",
+        description: description || "Açıklama Yok",
+        completed: false,
+        deleted: false
+    };
+    readTodos((err, todos) => {
+        if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+        todos.push(newTodo);
+        writeTodos(todos, (err) => {
+            if (err) return res.status(500).json({ error: "Dosya yazma hatası" });
+            res.redirect("/");
+        });
+    });
 };
 
-// Todo sil
-exports.deleteTodo = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const deleted = await Todo.delete(id);
-        if (!deleted) {
-            return res.status(404).json({ error: 'Todo bulunamadı.' });
+exports.deleteTodo = (req, res) => {
+    const { id } = req.params;
+    readTodos((err, todos) => {
+        if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+        const index = todos.findIndex(todo => todo.id === id);
+        if (index !== -1) {
+            todos[index].deleted = true;
+            writeTodos(todos, (err) => {
+                if (err) return res.status(500).json({ error: "Dosya yazma hatası" });
+                res.redirect("/");
+            });
+        } else {
+            res.status(404).json({ error: "Görev bulunamadı" });
         }
-        res.json({ message: 'Todo başarıyla silindi.' });
-    } catch (error) {
-        res.status(500).json({ error: 'Todo silinirken hata oluştu.' });
-    }
+    });
+};
+
+exports.completeTodo = (req, res) => {
+    const { id } = req.params;
+    readTodos((err, todos) => {
+        if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+        const index = todos.findIndex(todo => todo.id === id);
+        if (index !== -1) {
+            todos[index].completed = true;
+            writeTodos(todos, (err) => {
+                if (err) return res.status(500).json({ error: "Dosya yazma hatası" });
+                res.redirect("/");
+            });
+        } else {
+            res.status(404).json({ error: "Görev bulunamadı" });
+        }
+    });
+};
+
+exports.restoreTodo = (req, res) => {
+    const { id } = req.params;
+    readTodos((err, todos) => {
+        if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+        const index = todos.findIndex(todo => todo.id === id);
+        if (index !== -1) {
+            todos[index].deleted = false;
+            writeTodos(todos, (err) => {
+                if (err) return res.status(500).json({ error: "Dosya yazma hatası" });
+                res.redirect("/");
+            });
+        } else {
+            res.status(404).json({ error: "Görev bulunamadı" });
+        }
+    });
+};
+
+exports.updateTodo = (req, res) => {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    readTodos((err, todos) => {
+        if (err) return res.status(500).json({ error: "Dosya okuma hatası" });
+        const index = todos.findIndex(todo => todo.id === id);
+        if (index !== -1) {
+            todos[index].title = title || todos[index].title;
+            todos[index].description = description || todos[index].description;
+            writeTodos(todos, (err) => {
+                if (err) return res.status(500).json({ error: "Dosya yazma hatası" });
+                res.redirect("/");
+            });
+        } else {
+            res.status(404).json({ error: "Görev bulunamadı" });
+        }
+    });
 };
