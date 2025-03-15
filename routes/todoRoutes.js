@@ -1,21 +1,20 @@
-// routes/todoRoutes.js
 const express = require('express');
 const router = express.Router();
 const todoController = require('../controllers/todoController');
 
-// Tüm todo'ları getir
-router.get('/', todoController.getAllTodos);
+//Listele
+router.get('/', todoController.getTodos);
 
-// Belirli bir todo'yu id ile getir
-router.get('/:id', todoController.getTodoById);
+//Oluştur
+router.post('/', todoController.addTodo);
 
-// Yeni bir todo oluştur
-router.post('/', todoController.createTodo);
-
-// Varolan bir todo'yu güncelle
+//Güncelle
 router.put('/:id', todoController.updateTodo);
 
-// Todo sil
+//Sil
 router.delete('/:id', todoController.deleteTodo);
+
+//Tamamla
+router.put('/complete/:id', todoController.completeTodo);
 
 module.exports = router;
