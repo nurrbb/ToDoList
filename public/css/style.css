@@ -21,7 +21,7 @@ body {
     border-radius: 20px;
 }
 
-/* Nav tab active rengi */
+
 .nav-tabs .nav-link.active {
     background-color: #667eea;
     color: #fff;

@@ -38,8 +38,8 @@ $(document).ready(function() {
             const cardHtml = `
                 <div class="card mb-2 ${isCompleted}">
                     <div class="card-body">
-                        <h5 class="card-title ${titleClass}">${todo.title || 'Başlık Yok'}</h5>
-                        <p class="card-text ${descriptionClass}">${todo.description || 'Açıklama Yok'}</p>
+                        <h5 class="card-title ${titleClass}">${todo.title || 'Görev Yok'}</h5>
+                        <p class="card-text ${descriptionClass}">${todo.description || 'Detay Yok'}</p>
                         <div class="d-flex justify-content-end gap-2">
                             ${
                 !todo.completed
