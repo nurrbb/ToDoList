@@ -37,9 +37,10 @@ npm start
 ```
 Bu komut uygulamanın [http://localhost:4444](http://localhost:4444) adresinde çalışmasını sağlar.
 
-```
 
 ## 🎯 API Kullanımı
+
+```
 
 | Yöntem | Endpoint         | Açıklama                              |
 |--------|------------------|---------------------------------------|
@@ -49,8 +50,23 @@ Bu komut uygulamanın [http://localhost:4444](http://localhost:4444) adresinde �
 | PUT    | /todos/:id       | Belirtilen görevi günceller           |
 | DELETE | /todos/:id       | Belirtilen görevi siler               |
 
+```
+
+##  Uygulamadan Görseller
+
+![01](https://github.com/user-attachments/assets/d7aef49f-7130-4b4c-9ce6-419d6f64b93c)
 
 
----
-**Hazırlayan:** [Nur Bülbül](https://github.com/nurrbb)
+
+
+![02](https://github.com/user-attachments/assets/cd7b10f6-a417-49ea-baeb-3fa9cd241fdb)
+
+
+
+
+![03](https://github.com/user-attachments/assets/aeb3185b-3328-4d35-83cc-13059d7ac77e)
+
+
+
+
 
